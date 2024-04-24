@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import stripe
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, status
 
 from config import get_settings
 from database import SessionLocal, engine
@@ -15,7 +15,7 @@ db = SessionLocal()
 app = FastAPI()
 
 
-@app.post("api/process-payment/")
+@app.post("api/payment/")
 async def process_payment(request: Request, amount: int, currency: str, token: str):
     try:
         # Create a charge using the Stripe API
@@ -65,6 +65,16 @@ async def process_payment(request: Request, amount: int, currency: str, token: s
             "status": "error",
             "message": "Something went wrong. Please try again later.",
         }
+
+
+@app.get("/api/payment/", status_code=status.HTTP_200_OK)
+async def get_payments(request: Request):
+    return db.query(Payment).all()
+
+
+@app.get("/api/payment/{id}/", status_code=status.HTTP_200_OK)
+async def get_payment(request: Request, id: int):
+    return db.query(Payment).filter(Payment.id == id).first()
 
 
 # Run the FastAPI application
