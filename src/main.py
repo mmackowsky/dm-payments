@@ -10,7 +10,7 @@ stripe.api_key = settings.STRIPE_API_KEY
 app = FastAPI()
 
 
-@app.post("/process-payment/")
+@app.post("api/process-payment/")
 async def process_payment(amount: int, currency: str, token: str):
     try:
         # Create a charge using the Stripe API
