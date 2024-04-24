@@ -12,4 +12,4 @@ class Payment(Base):
     currency = Column(String, nullable=False)
     date = Column(String, nullable=False)
     description = Column(String, nullable=False)
-    status = Column(Boolean, nullable=False)
+    status = Column(String, nullable=False)
