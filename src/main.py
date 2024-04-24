@@ -2,6 +2,8 @@ import stripe
 from fastapi import FastAPI, HTTPException
 
 from config import get_settings
+from database import SessionLocal, engine
+from models import Payment
 
 settings = get_settings()
 
@@ -36,4 +38,5 @@ async def process_payment(amount: int, currency: str, token: str):
 if __name__ == "__main__":
     import uvicorn
 
+    Payment.metadata.create_all(bind=engine)
     uvicorn.run(app, host=settings.SERVICE_HOST, port=settings.SERVICE_PORT)
