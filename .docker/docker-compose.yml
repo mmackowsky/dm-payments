@@ -1,0 +1,35 @@
+version: '3.9'
+
+services:
+  dm-payments:
+    build:
+      context: ../
+      dockerfile: .docker/Dockerfile
+    command: bash -c "poetry run python src/main.py"
+    container_name: dm-water-consumption
+    volumes:
+      - .:/dm-payments
+    ports:
+      - "8400:8400"
+    depends_on:
+      db-dm-payments:
+        condition: service_healthy
+
+  db-dm-payments:
+    container_name: db-dm-payments
+    image: postgres:15
+    volumes:
+      - ./data/db-dm-payments:/var/lib/postgresql/data
+    env_file:
+      - ../.env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "${POSTGRES_USER}" ]
+      interval: 5s
+      timeout: 30s
+      retries: 6
