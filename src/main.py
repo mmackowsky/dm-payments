@@ -30,7 +30,7 @@ async def success():
 @app.get("/stripe/create-payment-session", status_code=status.HTTP_200_OK)
 async def create_payment_session():
     try:
-        # Tworzenie sesji płatności w Stripe
+        # Making payment session in Stripe
         session = stripe.checkout.Session.create(
             payment_method_types=["card"],
             line_items=[
@@ -38,7 +38,7 @@ async def create_payment_session():
                     "price_data": {
                         "currency": "usd",
                         "product_data": {
-                            "name": "Przykładowy produkt",
+                            "name": "Example product",
                         },
                         "unit_amount": 100,  # Price in cents
                     },
