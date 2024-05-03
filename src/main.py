@@ -2,6 +2,7 @@ from datetime import datetime
 
 import stripe
 from fastapi import FastAPI, HTTPException, Request, status
+from fastapi.responses import RedirectResponse
 
 from config import get_settings
 from database import SessionLocal, engine
@@ -15,69 +16,17 @@ db = SessionLocal()
 app = FastAPI()
 
 
-@app.post("api/payment/")
-async def process_payment(request: Request, amount: int, currency: str, token: str):
-    try:
-        # Create a charge using the Stripe API
-        charge = stripe.Charge.create(
-            amount=amount,
-            currency=currency,
-            source=token,  # Stripe token obtained from the client-side (e.g., Stripe.js)
-            description="Payment for FastAPI Store",
-        )
-        await save_data_to_db(
-            db=db,
-            id=set_new_id(db),
-            user=int(request.headers.get("request-user-id")),
-            amount=amount,
-            currency=currency,
-            date=str(datetime.now()),
-            description="Payment for FastAPI Store",
-            status="success",
-        )
-        return {"status": "success", "charge_id": charge.id}
-
-    except stripe.error.CardError as e:
-        await save_data_to_db(
-            db=db,
-            id=set_new_id(db),
-            user=int(request.headers.get("request-user-id")),
-            amount=amount,
-            currency=currency,
-            date=str(datetime.now()),
-            description="Payment for FastAPI Store",
-            status="error",
-        )
-        return {"status": "error", "message": str(e)}
-
-    except stripe.error.StripeError as e:
-        await save_data_to_db(
-            db=db,
-            id=set_new_id(db),
-            user=int(request.headers.get("request-user-id")),
-            amount=amount,
-            currency=currency,
-            date=str(datetime.now()),
-            description="Payment for FastAPI Store",
-            status="error",
-        )
-        return {
-            "status": "error",
-            "message": "Something went wrong. Please try again later.",
-        }
+@app.get("/stripe/cancel")
+async def cancel():
+    return {"message": "Operation cancelled"}
 
 
-@app.get("/api/payment/", status_code=status.HTTP_200_OK)
-async def get_payments(request: Request):
-    return db.query(Payment).all()
+# Endpoint that redirect user to Stripe payment form
+@app.get("/stripe/checkout")
+async def checkout():
+    return RedirectResponse(url="/stripe/create-payment-session", status_code=302)
 
 
-@app.get("/api/payment/{id}/", status_code=status.HTTP_200_OK)
-async def get_payment(request: Request, id: int):
-    return db.query(Payment).filter(Payment.id == id).first()
-
-
-# Run the FastAPI application
 if __name__ == "__main__":
     import uvicorn
 
