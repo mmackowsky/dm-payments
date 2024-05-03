@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import stripe
-from fastapi import FastAPI, HTTPException, Request, status
+from fastapi import FastAPI, Header, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
 
 from config import get_settings
@@ -19,6 +19,58 @@ app = FastAPI()
 @app.get("/stripe/cancel")
 async def cancel():
     return {"message": "Operation cancelled"}
+
+
+# Endpoint to start payment
+@app.get("/stripe/create-payment-session")
+async def create_payment_session():
+    try:
+        # Tworzenie sesji płatności w Stripe
+        session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=[
+                {
+                    "price_data": {
+                        "currency": "usd",
+                        "product_data": {
+                            "name": "Przykładowy produkt",
+                        },
+                        "unit_amount": 100,  # Cena w centach
+                    },
+                    "quantity": 1,
+                },
+            ],
+            mode="payment",
+            success_url="http://example.com/success",
+            cancel_url="http://example.com/cancel",
+        )
+        return session
+    except stripe.error.StripeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/stripe/webhook")
+async def webhook(request: Request, stripe_signature: str = Header(None)):
+    event = None
+    data = await request.body()
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload=data,
+            sig_header=stripe_signature,
+            secret=settings.STRIPE_WEBHOOK_KEY,
+        )
+    except ValueError as e:
+        # Invalid payload
+        raise e
+    except stripe.error.SignatureVerificationError as e:
+        # Invalid signature
+        raise e
+
+    # Handle the event
+    print("Unhandled event type {}".format(event["type"]))
+
+    return {"status": "success"}
 
 
 # Endpoint that redirect user to Stripe payment form
