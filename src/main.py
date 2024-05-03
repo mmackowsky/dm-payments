@@ -16,18 +16,18 @@ db = SessionLocal()
 app = FastAPI()
 
 
-@app.get("/stripe/cancel")
+@app.get("/stripe/cancel", status_code=status.HTTP_200_OK)
 async def cancel():
     return {"message": "Operation cancelled"}
 
 
-@app.get("/stripe/success")
+@app.get("/stripe/success", status_code=status.HTTP_200_OK)
 async def success():
     return {"message": "Operation ended successfully"}
 
 
 # Endpoint to start payment
-@app.get("/stripe/create-payment-session")
+@app.get("/stripe/create-payment-session", status_code=status.HTTP_200_OK)
 async def create_payment_session():
     try:
         # Tworzenie sesji płatności w Stripe
