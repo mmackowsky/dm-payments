@@ -40,7 +40,7 @@ async def create_payment_session():
                         "product_data": {
                             "name": "Przykładowy produkt",
                         },
-                        "unit_amount": 100,  # Cena w centach
+                        "unit_amount": 100,  # Price in cents
                     },
                     "quantity": 1,
                 },
