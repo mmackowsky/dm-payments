@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     SERVICE_PORT: int = os.getenv("SERVICE_PORT")
     SECRET_KEY: str = os.getenv("SECRET_KEY")
     STRIPE_API_KEY: str = os.getenv("STRIPE_API_KEY")
+    STRIPE_WEBHOOK_KEY: str = os.getenv("STRIPE_WEBHOOK_KEY")
     POSTGRES_USER: str = os.getenv("POSTGRES_USER")
     POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD")
     POSTGRES_HOST: str = os.getenv("POSTGRES_HOST")
