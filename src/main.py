@@ -21,6 +21,11 @@ async def cancel():
     return {"message": "Operation cancelled"}
 
 
+@app.get("/stripe/success")
+async def success():
+    return {"message": "Operation ended successfully"}
+
+
 # Endpoint to start payment
 @app.get("/stripe/create-payment-session")
 async def create_payment_session():
@@ -41,8 +46,8 @@ async def create_payment_session():
                 },
             ],
             mode="payment",
-            success_url="http://example.com/success",
-            cancel_url="http://example.com/cancel",
+            success_url=f"http://{settings.SERVICE_HOST}:{settings.SERVICE_PORT}/stripe/success",
+            cancel_url=f"http://{settings.SERVICE_HOST}:{settings.SERVICE_PORT}/stripe/cancel",
         )
         return session
     except stripe.error.StripeError as e:
