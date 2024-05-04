@@ -38,9 +38,9 @@ async def create_payment_session():
                     "price_data": {
                         "currency": "usd",
                         "product_data": {
-                            "name": "Example product",
+                            "name": "Subscribe",
                         },
-                        "unit_amount": 100,  # Price in cents
+                        "unit_amount": 1000,  # Price in cents
                     },
                     "quantity": 1,
                 },
