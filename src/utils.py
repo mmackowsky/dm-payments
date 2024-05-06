@@ -1,7 +1,7 @@
 from sqlalchemy import desc
 
 from database import SessionLocal
-from models import Payment
+from models import Subscription
 
 
 async def save_data_to_db(
@@ -11,16 +11,14 @@ async def save_data_to_db(
     amount: float,
     currency: str,
     date: str,
-    description: str,
     status: str,
 ):
-    data = Payment(
+    data = Subscription(
         id=id,
         user=user,
         amount=amount,
         currency=currency,
         date=date,
-        description=description,
         status=status,
     )
     db.add(data)
@@ -30,6 +28,6 @@ async def save_data_to_db(
 
 
 def set_new_id(db: SessionLocal):
-    last_object_id = db.query(Payment).order_by(desc(Payment.id)).first()
+    last_object_id = db.query(Subscription).order_by(desc(Subscription.id)).first()
     next_id = (last_object_id.id + 1) if last_object_id.id else 1
     return next_id
