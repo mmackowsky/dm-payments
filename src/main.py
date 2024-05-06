@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import stripe
 from fastapi import FastAPI, Header, HTTPException, Request, status
@@ -6,7 +6,7 @@ from fastapi.responses import RedirectResponse
 
 from config import get_settings
 from database import SessionLocal, engine
-from models import Payment
+from models import Subscription
 from utils import save_data_to_db, set_new_id
 
 settings = get_settings()
@@ -38,14 +38,17 @@ async def create_payment_session():
                     "price_data": {
                         "currency": "usd",
                         "product_data": {
-                            "name": "Subscribe",
+                            "name": "Subscription",
                         },
                         "unit_amount": 1000,  # Price in cents
+                        "recurring": {
+                            "interval": "month",
+                        },
                     },
                     "quantity": 1,
                 },
             ],
-            mode="payment",
+            mode="subscription",  # Changed from "payment"
             success_url=f"http://{settings.SERVICE_HOST}:{settings.SERVICE_PORT}/stripe/success",
             cancel_url=f"http://{settings.SERVICE_HOST}:{settings.SERVICE_PORT}/stripe/cancel",
         )
@@ -75,6 +78,18 @@ async def webhook(request: Request, stripe_signature: str = Header(None)):
     # Handle the event
     print("Unhandled event type {}".format(event["type"]))
 
+    if event["type"] == "customer.subscription.created":
+        data = Subscription(
+            id=set_new_id(db),
+            user=int(request.headers.get("request-user-id")),
+            last_payment_date=datetime.now(),
+            next_payment_date=datetime.now() + timedelta(days=31),
+            status="active",
+        )
+        db.add(data)
+        db.commit()
+        db.refresh(data)
+
     return {"status": "success"}
 
 
@@ -87,5 +102,6 @@ async def checkout():
 if __name__ == "__main__":
     import uvicorn
 
-    Payment.metadata.create_all(bind=engine)
+    Subscription.metadata.drop_all(bind=engine)
+    Subscription.metadata.create_all(bind=engine)
     uvicorn.run(app, host=settings.SERVICE_HOST, port=settings.SERVICE_PORT)
