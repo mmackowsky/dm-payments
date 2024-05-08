@@ -23,5 +23,4 @@ To use Stripe payments you need to:
 - get STRIPE_API_KEY and put it to your .env file (all needed settings you will find in config.py file)
 - to use webhook you will need to add an endpoint with it to the project that you made earlier. To do this you have to login to your Stripe account by Stripe CLI in the application terminal (poetry run stripe login). Below CLI installing tutorial: [Get started with the Stripe CLI | Stripe Documentation](https://docs.stripe.com/stripe-cli)
 <img src="https://github.com/mmackowsky/dm-payments/assets/123114901/1b1a00ea-0fdd-4fda-bf30-12778507fc41">
-- next do: stripe listen –forward-to <path_to_endpoint>
 - now after making a payment webhook will handle all events
