@@ -76,7 +76,7 @@ async def webhook(request: Request, stripe_signature: str = Header(None)):
         raise e
 
     # Handle the event
-    print("Unhandled event type {}".format(event["type"]))
+    print("{}".format(event["type"]))
 
     if event["type"] == "customer.subscription.created":
         data = Subscription(
@@ -102,6 +102,5 @@ async def checkout():
 if __name__ == "__main__":
     import uvicorn
 
-    Subscription.metadata.drop_all(bind=engine)
     Subscription.metadata.create_all(bind=engine)
     uvicorn.run(app, host=settings.SERVICE_HOST, port=settings.SERVICE_PORT)
