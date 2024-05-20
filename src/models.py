@@ -1,7 +1,4 @@
-from datetime import timedelta
-
-from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String
-from sqlalchemy.sql import func
+from sqlalchemy import Column, DateTime, Float, Integer, String
 
 from database import Base
 
