@@ -81,7 +81,7 @@ async def webhook(request: Request, stripe_signature: str = Header(None)):
     if event["type"] == "customer.subscription.created":
         data = Subscription(
             id=set_new_id(db),
-            user=int(request.headers.get("request-user-id")),
+            user=3,
             last_payment_date=datetime.now(),
             next_payment_date=datetime.now() + timedelta(days=31),
             status="active",
