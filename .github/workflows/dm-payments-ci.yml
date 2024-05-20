@@ -55,6 +55,13 @@ jobs:
         cd src
         poetry run python tests.py
       env:
+        ALGORITHM: ${{ secrets.ALGORITHM }}
+        SERVICE_HOST: ${{ secrets.SERVICE_HOST }}
+        SERVICE_PORT: ${{ secrets.SERVICE_PORT }}
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+        STRIPE_WEBHOOK_KEY: ${{ secrets.STRIPE_WEBHOOK_KEY }}
+        SQLALCHEMY_DATABASE_URL: ${{ secrets.SQLALCHEMY_DATABASE_URL }}
         POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
         POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
         POSTGRES_NAME: postgres
