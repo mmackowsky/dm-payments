@@ -55,8 +55,8 @@ jobs:
         cd src
         poetry run python tests.py
       env:
-        DB_PORT: ${{ secrets.POSTGRES_PORT }}
-        DB_HOST: ${{ secrets.POSTGRES_HOST }}
-        DB_NAME: postgres
-        DB_PASSWORD: postgres
-        DB_USER: postgres
+        POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+        POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+        POSTGRES_NAME: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_USER: postgres
