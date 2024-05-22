@@ -47,7 +47,7 @@ class TestStripeEndpoints(unittest.TestCase):
 
     @patch("main.stripe.Webhook.construct_event")
     def test_webhook_subscription_created(self, mock_construct_event):
-        # subscriptions_before = db.query(Subscription).all()
+        subscriptions_before = db.query(Subscription).all()
         # Mock event
         mock_construct_event.return_value = {"type": "customer.subscription.created"}
 
@@ -57,15 +57,15 @@ class TestStripeEndpoints(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        #
-        # # Check that new object has been created
-        #
-        # subscriptions_after = db.query(Subscription).all()
-        #
-        # self.assertEqual(len(subscriptions_before), len(subscriptions_after) - 1)
-        #
-        # # Deleting item from database
-        # delete_last_item(db)
+
+        # Check that new object has been created
+
+        subscriptions_after = db.query(Subscription).all()
+
+        self.assertEqual(len(subscriptions_before), len(subscriptions_after) - 1)
+
+        # Deleting item from database
+        delete_last_item(db)
 
 
 if __name__ == "__main__":
