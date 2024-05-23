@@ -1,4 +1,4 @@
-name: DeviceMinder CI
+name: DeviceMinder Payments CI
 
 on:
   push:
