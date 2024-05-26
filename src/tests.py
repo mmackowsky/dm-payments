@@ -1,21 +1,72 @@
+import datetime
 import unittest
 from unittest.mock import MagicMock, patch
 
 from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 from config import get_settings
-from database import SessionLocal
+from database import get_db
 from main import app
 from models import Subscription
 from utils import delete_last_item
 
-db = SessionLocal()
 settings = get_settings()
+
+SQLALCHEMY_DATABASE_URL = "postgresql://postgres:postgres@localhost/postgres"
+
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
+
+Base = declarative_base()
+
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+Subscription.metadata.create_all(bind=engine)
+
+
+def override_get_db():
+    try:
+        db = TestingSessionLocal()
+        yield db
+    finally:
+        db.close()
 
 
 class TestStripeEndpoints(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        Base.metadata.create_all(bind=engine)
+        app.dependency_overrides[get_db] = override_get_db
+
+    @classmethod
+    def tearDownClass(cls):
+        Base.metadata.drop_all(bind=engine)
+
     def setUp(self):
         self.client = TestClient(app)
+        self.db = TestingSessionLocal()
+        energy = Subscription(
+            id=1,
+            user=1,
+            amount=10,
+            currency="usd",
+            last_payment_date=datetime.datetime(2020, 1, 1),
+            next_payment_date=datetime.datetime(2020, 2, 1),
+            status="active",
+        )
+        self.db.add(energy)
+        self.db.commit()
+        self.db.refresh(energy)
+        self.db.close()
+
+    def tearDown(self):
+        db = TestingSessionLocal()
+        db.query(Subscription).delete()
+        db.commit()
+        db.close()
 
     @patch("main.stripe.checkout.Session.create")
     def test_create_payment_session(self, mock_create_session):
@@ -60,12 +111,12 @@ class TestStripeEndpoints(unittest.TestCase):
 
         # Check that new object has been created
 
-        subscriptions_after = db.query(Subscription).all()
+        subscriptions_after = self.db.query(Subscription).all()
 
         self.assertEqual(len(subscriptions_before), len(subscriptions_after) - 1)
 
         # Deleting item from database
-        delete_last_item(db)
+        delete_last_item(self.db)
 
 
 if __name__ == "__main__":
