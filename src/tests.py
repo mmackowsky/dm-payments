@@ -98,7 +98,7 @@ class TestStripeEndpoints(unittest.TestCase):
 
     @patch("main.stripe.Webhook.construct_event")
     def test_webhook_subscription_created(self, mock_construct_event):
-        subscriptions_before = db.query(Subscription).all()
+        subscriptions_before = self.db.query(Subscription).all()
         # Mock event
         mock_construct_event.return_value = {"type": "customer.subscription.created"}
 
