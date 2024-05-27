@@ -96,7 +96,7 @@ class TestStripeEndpoints(unittest.TestCase):
             cancel_url=f"http://{settings.SERVICE_HOST}:{settings.SERVICE_PORT}/stripe/cancel",
         )
 
-    # @patch("main.stripe.Webhook.construct_event")
+    @patch("main.stripe.Webhook.construct_event")
     def test_webhook_subscription_created(self, mock_construct_event):
         subscriptions_before = self.db.query(Subscription).all()
         # Mock event
