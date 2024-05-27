@@ -100,7 +100,21 @@ class TestStripeEndpoints(unittest.TestCase):
     def test_webhook_subscription_created(self, mock_construct_event):
         subscriptions_before = self.db.query(Subscription).all()
         # Mock event
-        mock_construct_event.return_value = {"type": "customer.subscription.created"}
+        if mock_construct_event.return_value == {
+            "type": "customer.subscription.created"
+        }:
+            subscription = Subscription(
+                id=1,
+                user=1,
+                amount=10,
+                currency="usd",
+                last_payment_date=datetime.datetime(2020, 1, 1),
+                next_payment_date=datetime.datetime(2020, 2, 1),
+                status="active",
+            )
+            self.db.add(subscription)
+            self.db.commit()
+            self.db.refresh(subscription)
 
         # Call endpoint /stripe/webhook
         response = self.client.post(
