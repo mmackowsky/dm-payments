@@ -11,7 +11,6 @@ from config import get_settings
 from database import get_db
 from main import app
 from models import Subscription
-from utils import delete_last_item
 
 settings = get_settings()
 
